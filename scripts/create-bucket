@@ -32,11 +32,16 @@ if aws s3api head-bucket --bucket "$bucket_name" --region "$region" 2>/dev/null;
 fi
 
 # Create the bucket
-echo "Creating bucket $bucket_name in region $region..."
-bucket_creation_response=$(aws s3api create-bucket \
-    --bucket "$bucket_name" \
-    --region "$region" \
-    --create-bucket-configuration LocationConstraint="$region" 2>&1)
+if [[ "$region" == "us-east-1" ]]; then
+  bucket_creation_response=$(aws s3api create-bucket \
+      --bucket "$bucket_name" \
+      --region "$region" 2>&1)
+else
+  bucket_creation_response=$(aws s3api create-bucket \
+      --bucket "$bucket_name" \
+      --region "$region" \
+      --create-bucket-configuration LocationConstraint="$region" 2>&1)
+fi
 
 # Check if the bucket creation was successful
 if [[ $? -ne 0 ]]; then
